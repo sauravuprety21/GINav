@@ -187,6 +187,13 @@ while 1
         
         % If GNSS is not available, use the INS solutions
         time1=ins.time.time+ins.time.sec;
+        time3 = gpst2utc(ins.time);
+        time3 = time3.time + time3.sec;
+        if(time3 >= 1553744035.0)
+           me = 2 * 3;
+        end
+        
+
         time2=round(ins.time.time+ins.time.sec);
         if nobsr<=0&&abs(time1-time2)<(0.501/rtk_gi.opt.ins.sample_rate)
             ti=ti+1;

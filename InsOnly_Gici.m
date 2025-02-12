@@ -20,28 +20,40 @@ elseif strcmp(file.imu,'')&&(opt.ins.mode==glc.GIMODE_LC||opt.ins.mode==glc.GIMO
     error('GNSS/INS integration mode,but have no imu file!!!');
 end
 
-ref = load('D:\local\GINav\data\data_cpt\cpt_pva_ref.mat');
 
-ref_i = 950+1;
-ref_f = 1000+1;
+%% Segment 1
+% t_i = gpst2time(2254, 121126.0);
+% t_i =  t_i.time + t_i.sec;
+% 
+% t_f = gpst2time(2254,121152.0);
+% t_f =  t_f.time + t_f.sec;
+% 
+% 
+% pos_blh_i = [31.0299236017 121.44114007 16.961];
+% pos_blh_i(1) = deg2rad(pos_blh_i(1));
+% pos_blh_i(2) = deg2rad(pos_blh_i(2));
+% 
+% 
+% att_i = deg2rad([ -0.90309001 0.80889952 -69.83475042]);
+% vel_i = [8.2658899 3.1408411 0.026144235];
 
-
-t_i = gpst2time(ref.reference(ref_i).week, ...
-            ref.reference(ref_i).sow);
+%% Segment 2
+t_i = gpst2time(2254, 121009.0);
 t_i =  t_i.time + t_i.sec;
 
-t_f = gpst2time(ref.reference(ref_f).week, ...
-            ref.reference(ref_f).sow);
+t_f = gpst2time(2254, 121129.0);
 t_f =  t_f.time + t_f.sec;
 
 
-pos_xyz_i = ref.reference(ref_i).pos;
-[pos_blh_i, Cne_i] = xyz2blh(pos_xyz_i);
+pos_blh_i = [31.030362935 121.4424361217 17.029];
+pos_blh_i(1) = deg2rad(pos_blh_i(1));
+pos_blh_i(2) = deg2rad(pos_blh_i(2));
 
-att_i = deg2rad(ref.reference(ref_i).att);
-vel_i = Cne_i * ref.reference(ref_i).vel';
 
-avp_i=[att_i,vel_i',pos_blh_i]';
+att_i = deg2rad([  1.657  -1.349 110.337]);
+vel_i = [ -5.362273     -2.2233678     0.06540917];
+
+avp_i=[att_i,vel_i,pos_blh_i]';
 
 ins=ins_init(opt.ins,avp_i);
 
@@ -73,12 +85,6 @@ for i=1:nimu
 
 end
 
-
-pos_xyz_f = ref.reference(ref_f).pos;
-[pos_blh_f, Cne_f] = xyz2blh(pos_xyz_f);
-
-att_f = deg2rad(ref.reference(ref_f).att);
-vel_f = Cne_f * ref.reference(ref_f).vel';
 
 out = [header; num2cell(pva_ins)];
 
