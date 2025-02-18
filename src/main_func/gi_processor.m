@@ -189,7 +189,7 @@ while 1
         time1=ins.time.time+ins.time.sec;
         time3 = gpst2utc(ins.time);
         time3 = time3.time + time3.sec;
-        if(time3 >= 1553744035.0)
+        if(time3 >= 1545192717.0)
            me = 2 * 3;
         end
         

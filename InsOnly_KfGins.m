@@ -20,34 +20,36 @@ elseif strcmp(file.imu,'')&&(opt.ins.mode==glc.GIMODE_LC||opt.ins.mode==glc.GIMO
     error('GNSS/INS integration mode,but have no imu file!!!');
 end
 
-ref = load('D:\local\GINav\data\data_tokyo\tokyo_pva_ref.mat');
 
-ref_i = 9599+1;
-ref_f = 10599+1;
-
-
-t_i = gpst2time(ref.reference(ref_i).week, ...
-            ref.reference(ref_i).sow);
+%% Segment 2
+t_i = gpst2time(2254, 121009.0);
 t_i =  t_i.time + t_i.sec;
 
-t_f = gpst2time(ref.reference(ref_f).week, ...
-            ref.reference(ref_f).sow);
+t_f = gpst2time(2254, 121129.0);
 t_f =  t_f.time + t_f.sec;
 
+pos_blh_i = [30.4530279166 114.4605521035 30.994];
+pos_blh_i(1) = deg2rad(pos_blh_i(1));
+pos_blh_i(2) = deg2rad(pos_blh_i(2));
 
-pos_xyz_i = ref.reference(ref_i).pos;
-[pos_blh_i, Cne_i] = xyz2blh(pos_xyz_i);
+vel_i = [ -2.117     11.63     0.019];
 
-att_i = deg2rad(ref.reference(ref_i).att);
+eul_zyx_ned = deg2rad([  0.97041508,  -1.47477896, -9.26712073]);
 
-yaw = att_i(3);
-if yaw > pi
-    att_i(3) = 2*pi - yaw;
-end
+R_b2ned = eul2rotm(eul_zyx_ned, "XYZ");
 
-vel_i = Cne_i * ref.reference(ref_i).vel';
+R_ENU2NED = [0, 1, 0;
+            1, 0, 0;
+            0, 0, -1];
 
-avp_i=[att_i,vel_i',pos_blh_i]';
+R_NED2ENU = R_ENU2NED;
+
+R_b2enu = R_NED2ENU * R_b2ned * R_ENU2NED;
+
+eul_zyx_enu = rotm2eul(R_b2enu, "XYZ");
+
+
+avp_i=[eul_zyx_enu,vel_i,pos_blh_i]';
 
 ins=ins_init(opt.ins,avp_i);
 
@@ -79,12 +81,6 @@ for i=1:nimu
 
 end
 
-
-pos_xyz_f = ref.reference(ref_f).pos;
-[pos_blh_f, Cne_f] = xyz2blh(pos_xyz_f);
-
-att_f = deg2rad(ref.reference(ref_f).att);
-vel_f = Cne_f * ref.reference(ref_f).vel';
 
 out = [header; num2cell(pva_ins)];
 
