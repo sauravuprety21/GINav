@@ -106,41 +106,41 @@ elseif norm(rr)==0&&norm(ve)==0
     stat=0;
 end
 
-% IGG-3 robust model, only for SPP/INS mode
-if opt.ins.aid(2)==1&&opt.mode==glc.PMODE_SPP&&stat==1&&rtk_gi.ngnsslock>10
-    
-    Q=H*ins.P*H'+R;
-    c0 = 2; c1 = 5;
-    nv = size(v,1); std_res=zeros(nv,1); rfact=zeros(nv,1);
-    
-    for i=1:nv
-        std_res(i)=abs(v(i))/sqrt(Q(i,i));
-    end
-    
-    % robust factor
-    for i=1:nv
-        if std_res(i) <= c0
-            rfact(i) = 1;
-        elseif (std_res(i) >= c0) && (std_res(i) <= c1)
-            rfact(i)= abs(std_res(i))/c0 * ((c1-c0)/(c1-abs(std_res(i))))^2;
-        else
-            rfact(i) = 10^6;
-        end
-    end
-    
-    for i=1:nv
-        for j=1:nv
-            if j~=i,continue;end
-            R(i,j)=R(i,j)*sqrt(rfact(i)*rfact(j));
-        end
-    end
-
-    idx=(rfact==10^6);
-    v(idx,:)=[]; H(idx,:)=[]; R(idx,:)=[]; R(:,idx)=[];
-
-    if isempty(v),stat=0;end
-    
-end
+% % IGG-3 robust model, only for SPP/INS mode
+% if opt.ins.aid(2)==1&&opt.mode==glc.PMODE_SPP&&stat==1&&rtk_gi.ngnsslock>10
+% 
+%     Q=H*ins.P*H'+R;
+%     c0 = 2; c1 = 5;
+%     nv = size(v,1); std_res=zeros(nv,1); rfact=zeros(nv,1);
+% 
+%     for i=1:nv
+%         std_res(i)=abs(v(i))/sqrt(Q(i,i));
+%     end
+% 
+%     % robust factor
+%     for i=1:nv
+%         if std_res(i) <= c0
+%             rfact(i) = 1;
+%         elseif (std_res(i) >= c0) && (std_res(i) <= c1)
+%             rfact(i)= abs(std_res(i))/c0 * ((c1-c0)/(c1-abs(std_res(i))))^2;
+%         else
+%             rfact(i) = 10^6;
+%         end
+%     end
+% 
+%     for i=1:nv
+%         for j=1:nv
+%             if j~=i,continue;end
+%             R(i,j)=R(i,j)*sqrt(rfact(i)*rfact(j));
+%         end
+%     end
+% 
+%     idx=(rfact==10^6);
+%     v(idx,:)=[]; H(idx,:)=[]; R(idx,:)=[]; R(:,idx)=[];
+% 
+%     if isempty(v),stat=0;end
+% 
+% end
 
 if stat==1
     % measurement update

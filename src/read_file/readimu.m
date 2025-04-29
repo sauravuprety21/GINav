@@ -13,8 +13,8 @@ if ins.data_format==1
     dt=1/ins.sample_rate;
     for i=1:n
         time=gpst2time(imudata(i,1),imudata(i,2));
-        % if ts.time~=0&&timediff(time,ts)<0,continue;end
-        % if te.time~=0&&timediff(time,te)>0,continue;end
+        if ts.time~=0&&timediff(time,ts)<0,continue;end
+        if te.time~=0&&timediff(time,te)>0,continue;end
         
         if imu.n+1>size(imu.data,1)
             imu.data(imu.n+1:imu.n+NMAX)=repmat(gls.imud,NMAX,1);

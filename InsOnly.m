@@ -20,18 +20,18 @@ elseif strcmp(file.imu,'')&&(opt.ins.mode==glc.GIMODE_LC||opt.ins.mode==glc.GIMO
     error('GNSS/INS integration mode,but have no imu file!!!');
 end
 
-ref = load('D:\local\GINav\data\data_tokyo\tokyo_pva_ref.mat');
+ref = load('D:\local\GINav\data\data_cpt\cpt_pva_ref.mat');
 
-ref_i = 9599+1;
-ref_f = 10599+1;
+ref_i = 950+1;
+ref_f = ref_i + 120 + 1;
 
 
-t_i = gpst2time(ref.reference(ref_i).week, ...
-            ref.reference(ref_i).sow);
+t_i = gpst2utc(gpst2time(ref.reference(ref_i).week, ...
+            ref.reference(ref_i).sow));
 t_i =  t_i.time + t_i.sec;
 
-t_f = gpst2time(ref.reference(ref_f).week, ...
-            ref.reference(ref_f).sow);
+t_f = gpst2utc(gpst2time(ref.reference(ref_f).week, ...
+            ref.reference(ref_f).sow));
 t_f =  t_f.time + t_f.sec;
 
 
@@ -43,8 +43,9 @@ att_i = deg2rad(ref.reference(ref_i).att);
 yaw = att_i(3);
 if yaw > pi
     att_i(3) = 2*pi - yaw;
+else
+    att_i(3) = -1*yaw;
 end
-
 vel_i = Cne_i * ref.reference(ref_i).vel';
 
 avp_i=[att_i,vel_i',pos_blh_i]';
